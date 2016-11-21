@@ -1,0 +1,88 @@
+<html>
+  <head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h4 class="text-center">Speech synthesiser</h4>
+
+      <p>Enter some text in the input below and press return to hear it. change voices using the dropdown menu.</p>
+      <div class="form-group">
+        <textarea class="form-control" id="text" rows="10"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Select language</label>
+        <select id="language">
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Rate</label>
+        <input class="form-control" type="range" min="0.1" max="10" value="1" step="0.1" id="rate">
+        <div class="rate-value">1</div>
+      </div>
+      <div class="form-group">
+        <label>Pitch</label>
+        <input type="range" min="0" max="2" value="1" step="0.1" id="pitch">
+        <div class="pitch-value">1</div>
+      </div>
+      <div class="form-group">
+        <label>Volume</label>
+        <input type="range" min="0" max="1" value="1" step="0.1" id="volume">
+        <div class="volume-value">1</div>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-default" id="btn-speak">Speak</button>
+        <button class="btn btn-default" id="btn-pause">Pause</button>
+        <button class="btn btn-default" id="btn-resume">Resume</button>
+        <button class="btn btn-default" id="btn-stop">Stop</button>
+      </div>
+    </div>
+    <script>
+      /*
+      * speechSynthesis demo by Tai Nguyen<duytai.cse@gmail.com> from designveloper
+      * if speechSynthesis does not speak on your browser then clicks cancel button
+      * supporting by safari, firefox, chrome
+      * for more details: https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis
+      */
+      var synth = window.speechSynthesis;
+      $(document).ready(function() {
+        // add list of languages
+        synth.getVoices().forEach((voice, index)=> {
+          $('#language').append('<option name="language" value="'+ index +'">'+voice.name+ '(' + voice.lang + ')</option>');
+        });
+
+        ['rate', 'pitch', 'volume'].forEach((elemId)=> {
+          $('#' + elemId).change(function() {
+            const val = $(this).val();
+            $(this).next().text(val);
+          });
+        });
+
+        $('#btn-speak').click(function() {
+          const text = $('#text').val();
+          const langIndex = parseInt($('#language option:selected').val());
+          var utterThis = new SpeechSynthesisUtterance(text);
+          var voice = synth.getVoices()[langIndex];
+          utterThis.pitch = parseFloat($('#pitch').val());
+          utterThis.rate = parseFloat($('#rate').val());
+          utterThis.volume = parseFloat($('#volume').val());
+          utterThis.voice = voice;
+          synth.speak(utterThis);
+        });
+
+        $('#btn-pause').click(function() {
+          synth.pause();
+        });
+
+        $('#btn-resume').click(function() {
+          synth.resume();
+        });
+
+        $('#btn-stop').click(function() {
+          synth.cancel();
+        });
+      });
+    </script>
+  </body>
+</html>
